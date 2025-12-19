@@ -32,6 +32,11 @@ const cartSchema = new mongoose.Schema({
         type: Boolean,
         default: true
         },
+        totalPrice: {
+        type: Number,
+        default: 0,
+        min: 0
+        },
         addedAt: {
         type: Date,
         default: Date.now
@@ -49,22 +54,6 @@ const cartSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-});
-
-cartSchema.pre('save', function(next) {
-    try {
-        if (!this.items || this.items.length === 0) {
-            this.totalPrice = 0
-            this.totalQuantity = 0
-            return next()
-        }
-        this.totalQuantity = this.items.reduce((sum, item) => sum + item.quantity, 0);
-        this.totalPrice = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        next();
-    } catch (error) {
-        console.log("Ошибка при расчете корзины", error);
-        next(error)
-    }
 });
 
 export const Cart = mongoose.model("Cart", cartSchema);
