@@ -56,4 +56,29 @@ const cartSchema = new mongoose.Schema({
     timestamps: true
 });
 
+cartSchema.set('toJSON', {
+    transform: function (doc, ret) {
+        ret.id = ret._id.toString()
+        delete ret._id
+        delete ret.__v
+
+        if (ret.items && Array.isArray(ret.items)) {
+            ret.items = ret.items.map(item => {
+                // Создаем новый объект для элемента
+                const transformedItem = { ...item }
+
+                // Преобразуем _id в id для каждого элемента
+                if (transformedItem._id) {
+                    transformedItem.id = transformedItem._id.toString()
+                    delete transformedItem._id
+                }
+
+                return transformedItem
+            })
+        }
+
+        return ret
+    }
+})
+
 export const Cart = mongoose.model("Cart", cartSchema);
